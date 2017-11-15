@@ -75,6 +75,7 @@ if '--filter1' in sys.argv:
   f1db = plyvel.DB('filter1.ldb', create_if_missing=True)
   for keyword, freq in sorted(keyword_freq.items(), key=lambda x:x[1]*-1)[:10000] :
     keyword_index[keyword] = len( keyword_index )
+  open('keyword_index.json', 'w').write( json.dumps(keyword_index, indent=2, ensure_ascii=False) )
   for name in glob.glob('step1/*'):
     db = plyvel.DB(name, create_if_missing=False)
     for index, (bkey, val) in enumerate(db):
@@ -108,9 +109,10 @@ if '--make_npy' in sys.argv:
     #print( val.norm.tolist() )
     #if np.isfinite(val.norm).any() :
     # continue
-    print(bkey.decode('utf8'))
+    if index%1000 == 0:
+      print(bkey.decode('utf8'))
     norms.append( val.norm )
-    if index > 1000000:
+    if index > 100000:
       break
   norms = np.array( norms )
   np.save('norms', norms)
